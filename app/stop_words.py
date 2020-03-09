@@ -12,5 +12,3 @@ if __name__ == '__main__':
                         'an', 'one', 'thousand', 'eight', 'hundred', 'and', 'sixty', \
                         'five', 'novel', 'write', 'by', 'english', 'author', 'charles', \
                         'lutwidge', 'dodgson', 'under', 'the', 'pseudonym', 'lewis', 'carrollone']
-
-    print('\n'.join(remove_stop_word(test_string_list)))

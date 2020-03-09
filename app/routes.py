@@ -18,4 +18,5 @@ def index():
 @app.route('/', methods=['POST'])
 def form():
     text = request.form['text']
-    return ' '.join(preprocess(text))
+    result = ' '.join(preprocess(text))
+    return render_template('index.html', result=result)

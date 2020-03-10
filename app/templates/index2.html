@@ -1,9 +1,8 @@
 <html>
 
     <head>
+<!--        <link rel="stylesheet" href="{{ url_for('static', filename='styles/main_page.css') }}">-->
         <title>Welcome to InnoGruk</title>
-        <script type="text/javascript" src="static/js/stream.js"></script>
-        <link rel="stylesheet" type="text/css" href="static/styles/main_page.css" />
     </head>
 
     <body>
@@ -15,10 +14,10 @@
             <input name="text">
             <input type="submit">
         </form>
-        <div> {{result}}</div>
+        <div> {{result}} </div>
         <hr>
 
-        {% block content %}{% endblock %}
+
     </body>
 
 

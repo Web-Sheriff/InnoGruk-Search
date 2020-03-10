@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+
+    <div id="data">nothing received yet</div>
+    {% for i, c in data %}
+    <script>
+        $("#data").text("{{ i }} {{ c }}")
+    </script>
+    {% endfor %}
+
+{% endblock %}

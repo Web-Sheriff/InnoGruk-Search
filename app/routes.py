@@ -105,7 +105,7 @@ def stream_get():
 @app.route('/home', methods=['POST'])
 def stream_post():
     query = request.form['text']
-    message, search_result, track = search_disk(query, prfx, psfx, sndx, './app/index')
+    message, search_result, track = search_disk(query, prfx, psfx, sndx, aux, './app/index')
     search_result = [f'<a href="show_doc_{res}">{res}</a>' for res in search_result]
     return Response(stream_template('stream.html', data=crawler_generator(),
                                     message=message.split('\n')[:-1], search_result=search_result, track=f'<h4>Query track: {track} </h4> <hr>'))

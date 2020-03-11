@@ -11,7 +11,7 @@ from app.soundex import soundex
 from app.index_loader import load_index, get_index_keys, index_find
 
 
-def search_disk(query, prfx, psfx, sndx, path):
+def search_disk(query, prfx, psfx, sndx, aux, path):
     index_keys = get_index_keys(path)
 
     res = []
@@ -19,14 +19,17 @@ def search_disk(query, prfx, psfx, sndx, path):
     message = ''
 
     words = query.split()
-    pr_words = tokenize(normalize(query))
+    clear_query = ''
+    for w in words:
+        clear_query += ''.join(map(str, remove_stop_word([w]))) + ' '
+
+    pr_words = tokenize(normalize(clear_query))
 
     for w in words:
         for i, prw in enumerate(pr_words):
             if levenshtein(prw, w) <= 1 and '*' in w:
                 pr_words[i] = w
-            elif remove_stop_word([w]):
-                pr_words[i] = remove_stop_word([w])[0]
+    print(pr_words)
 
     message += f'Query: {" ".join(words)}\n'
     message += f'Preprocessed query: {" ".join(pr_words)}\n'
@@ -46,27 +49,35 @@ def search_disk(query, prfx, psfx, sndx, path):
                     for key in prfx.keys(prefix=split_wd[0]):
                         if key in index_keys:
                             res_.append(index_find(key, path))
-                            track += f'{key}||'
-
-                    res_ = list(reduce(lambda i, j: i | j, (set(x) for x in res_)))
-                    track = track[:-2]
-
-                except:
-                    track += 'MIDLEFIX ERROR'
-
-            elif split_wd[0] == '':
-
-                try:
-                    for key in psfx.keys(prefix=split_wd[1][::-1]):
-                        if key in index_keys:
-                            res_.append(index_find(key, path))
-                            track += f'{key}||'
+                            if key in aux:
+                                res_.append(aux[key])
+                                track += f'{key}||'
+                            else:
+                                track += f'{key}||'
 
                     res_ = list(reduce(lambda i, j: i | j, (set(x) for x in res_)))
                     track = track[:-2]
 
                 except:
                     track += 'POSTFIX ERROR'
+
+            elif split_wd[0] == '':
+
+                try:
+                    for key in psfx.keys(prefix=split_wd[1][::-1]):
+                        if key[::-1] in index_keys:
+                            res_.append(index_find(key[::-1], path))
+                            if key[::-1] in aux:
+                                res_.append(aux[key[::-1]])
+                                track += f'{key[::-1]}||'
+                            else:
+                                track += f'{key[::-1]}||'
+
+                    res_ = list(reduce(lambda i, j: i | j, (set(x) for x in res_)))
+                    track = track[:-2]
+
+                except:
+                    track += 'PREFIX ERROR'
 
             else:
                 split_wd = list(filter(None, split_wd))
@@ -80,7 +91,12 @@ def search_disk(query, prfx, psfx, sndx, path):
                                 pre_key = preprocess(pref_key)[0]
                                 if pre_key in index_keys:
                                     res_.append(index_find(pre_key, path))
-                                    track += f'{pre_key}||'
+                                    if pre_key in aux:
+                                        res_.append(aux[pre_key])
+                                        track += f'{pre_key}||'
+                                    else:
+                                        track += f'{pre_key}||'
+
 
                     res_ = list(reduce(lambda i, j: i | j, (set(x) for x in res_)))
                     track = track[:-2]
@@ -93,15 +109,18 @@ def search_disk(query, prfx, psfx, sndx, path):
         else:
             try:
                 res.append(index_find(w, path))
+                if w in aux:
+                    res.append(aux[w])
                 track += w
             except:
                 try:
-                    message += f'First five words with the same soundex: ' \
-                               f'\"{", ".join(list(islice(sndx[soundex(w)], 5)))}\"...\n'
                     right_words = []
-                    if soundex(w) in sndx:
+                    if soundex(w) not in sndx:
+                        message += f'There is no soundex for the word \"{w}\"\n'
+                    else:
                         right_words = find_the_closest_words(w, sndx[soundex(w)])
-
+                        message += f'First five words with the same soundex: ' \
+                                   f'\"{", ".join(list(islice(sndx[soundex(w)], 5)))}\"...\n'
 
                     if right_words:
                         message += f'Probably, you mentioned \"{", ".join(right_words)}\" instead of \"{w}\"\n'
@@ -112,9 +131,14 @@ def search_disk(query, prfx, psfx, sndx, path):
                         pre_ww = preprocess(ww)[0]
                         if pre_ww in index_keys:
                             res_.append(index_find(pre_ww, path))
-                            track += f'{ww}||'
+                            if pre_ww in aux:
+                                res.append(aux[pre_ww])
+                                track += f'{ww}||'
+                            else:
+                                track += f'{ww}||'
 
-                    track = track[:-2]
+                    if track[-1] == '|':
+                        track = track[:-2]
 
                     res_ = list(reduce(lambda i, j: i | j, (set(x) for x in res_)))
                     res.append(res_)
@@ -154,13 +178,15 @@ if __name__ == '__main__':
     index = {'apple': [0, 1, 2, 3], 'borrow': [0, 1, 2], 'friend': [1, 2, 3], 'ginger': [0, 2, 3],
              'lermontov': [0, 3], 'money': [1, 2], 'november': [0, 1, 2, 3], 'object': [4]}
 
+    aux = {}
+
     path = './index'
 
     load_index(index, path)
 
     query = 'ap'
 
-    message, result, track = search_disk(query, prfx, psfx, sndx, './index')
+    message, result, track = search_disk(query, prfx, psfx, sndx, aux, './index')
     print(message)
     print(result)
     print(track)

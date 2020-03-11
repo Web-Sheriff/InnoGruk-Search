@@ -1,19 +1,22 @@
 <html>
-
-    <head>
+<head>
         <title>Welcome to InnoGruk</title>
         <script src="http://code.jquery.com/jquery-latest.js"></script>
         <link rel="stylesheet" type="text/css" href="static/styles/home_page.css" />
+
     </head>
 
     <body>
 
-        <h2>InnoGruk Search Engine: <a href="/">Info</a></h2>
+        <img src="static/img/logo.png" alt="Paris" class='center' style="width:300px;">
+
+        <h2 align="center">Groogle Search Engine: <a href="/">Info</a></h2>
         <hr>
 
-        <form method="POST">
-            <input name="text">
-            <input type="submit">
+
+        <form class='container' method="POST">
+            <input name="text" placeholder="Write search query">
+            <input type="submit" value="Groogle it!">
         </form>
         <div> {{result}}</div>
 

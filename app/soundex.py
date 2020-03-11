@@ -22,3 +22,5 @@ if __name__ == '__main__':
 
     for ts in test_strings:
         print(soundex(ts))
+    print('----------------------------')
+    print(soundex('oejfearjkoafojfoajijkaf'))

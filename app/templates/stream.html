@@ -3,11 +3,11 @@
 {% block content %}
 
 
-    <div id="data">nothing received yet</div>
-    {% for i, c in data %}
-    <script>
-        $("#data").text("{{ i }} {{ c }}")
-    </script>
-    {% endfor %}
+        <div id="data">Loading...</div>
+        {% for i in data %}
+        <script>
+            $("#data").text("{{ i+' added' }}")
+        </script>
+        {% endfor %}
 
 {% endblock %}

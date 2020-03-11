@@ -2,8 +2,8 @@
 
     <head>
         <title>Welcome to InnoGruk</title>
-        <script type="text/javascript" src="static/js/stream.js"></script>
-        <link rel="stylesheet" type="text/css" href="static/styles/main_page.css" />
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/styles/home_page.css" />
     </head>
 
     <body>
@@ -16,9 +16,20 @@
             <input type="submit">
         </form>
         <div> {{result}}</div>
+
+        {% for mes in message%}
+        <div> {{mes}}</div>
+        {% endfor %}
+        <hr>
+
+        <div> Documents: {{search_result}}</div>
+        <hr>
+
+        <div> Your query track: {{track}}</div>
         <hr>
 
         {% block content %}{% endblock %}
+
     </body>
 
 

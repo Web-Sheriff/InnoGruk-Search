@@ -1,0 +1,80 @@
+ tags are the only items
+on their line.  
+
+     Each REUTERS tag contains explicit specifications of the values
+of five attributes, TOPICS, LEWISSPLIT, CGISPLIT, OLDID, and NEWID.
+These attributes are meant to identify documents and groups of 
+documents, and have the following meanings: 
+
+     1. TOPICS : The possible values are YES, NO, and BYPASS:
+        a. YES indicates that *in the original data* there was at
+least one entry in the TOPICS fields.
+        b. NO indicates that *in the original data* the story had no
+entries in the TOPICS field.
+        c. BYPASS indicates that *in the original data* the story was
+marked with the string "bypass" (or a typographical variant on that
+string).
+     This poorly-named attribute unfortunately is the subject of much
+confusion. It is meant to indicate whether or not the document had
+TOPICS categories *in the raw Reuters-22173 dataset*.  The sole use of
+this attribute is to defining training set splits similar to those
+used in previous research. (See the section on training set splits.)
+The TOPICS attribute does **NOT** indicate anything about whether or
+not the Reuters-21578 document has any TOPICS categories.  (Version
+1.0 of this document was errorful on this point.)  That can be
+determined by actually looking at the TOPICS field. A story with
+TOPICS="YES" can have no TOPICS categories, and a story with
+TOPICS="NO" can have TOPICS categories.
+     Now, a reasonable (though not certain) assumption is that for all
+TOPICS="YES" stories the indexer at least thought about whether the
+story belonged to a valid TOPICS category.  Thus, the TOPICS="YES"
+stories with no topics can reasonably be considered negative examples
+for all 135 valid TOPICS categories.
+     TOPICS="NO" stories are more problematic in their interpretation.
+Some of them presumedly result because the indexer made an explicit
+decision that they did not belong to any of the 135 valid TOPICS
+categories.  However, there are many cases where it is clear that a
+story should belong to one or more TOPICS categories, but for some
+reason the category was not assigned.  There appear to be certain time
+intervals where large numbers of such stories are concentrated,
+suggesting that some parts of the data set were simply not indexed, or
+not indexed for some categories or category sets.  Also, in a few
+cases, the indexer clearly meant to assign TOPICS categories, but put
+them in the wrong field.  These cases have been corrected in the
+Reuters-21578 data, yielding stories that have TOPICS categories, but
+where TOPICS="NO", because the the category was not assigned in the
+raw version of the data.
+     "BYPASS" stories clearly were not indexed, and so are useful only
+for general distributional information on the language used in the
+documents.
+
+     2. LEWISSPLIT : The possible values are TRAINING, TEST, and
+NOT-USED.  TRAINING indicates it was used in the training set in the
+experiments reported in LEWIS91d (Chapters 9 and 10), LEWIS92b,
+LEWIS92e, and LEWIS94b.  TEST indicates it was used in the test set
+for those experiments, and NOT-USED means it was not used in those
+experiments.
+
+     3. CGISPLIT : The possible values are TRAINING-SET and
+PUBLISHED-TESTSET indicating whether the document was in the training
+set or the test set for the experiments reported in HAYES89 and
+HAYES90b.
+
+     4. OLDID : The identification number (ID) the story had in the
+Reuters-22173 collection.
+
+     5. NEWID : The identification number (ID) the story has in the
+Reuters-21578, Distribution 1.0 collection.  These IDs are assigned to
+the stories in chronological order.
+
+In addition, some REUTERS tags have a sixth attribute, CSECS, which
+can be ignored.  
+
+The use of these attributes is critical to allowing comparability
+between different studies with the collection, and is discussed
+further in Section VIII.
+
+
+  VI.B. Document-Internal Tags 
+
+     Just as the  and 

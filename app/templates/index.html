@@ -8,7 +8,7 @@
 
     <body>
 
-        <div>InnoGruk Search Engine: <a href="/index">Home</a></div>
+        <h2>InnoGruk Search Engine: <a href="/">Info</a></h2>
         <hr>
 
         <form method="POST">
@@ -19,16 +19,21 @@
 
         {% for mes in message%}
         <div> {{mes}}</div>
+        <hr>
         {% endfor %}
-        <hr>
 
-        <div> Documents: {{search_result}}</div>
+        {% for res in search_result%}
+        {{res | safe}}
+        {% endfor %}
+        {%if search_result != [] %}
         <hr>
+        {% endif %}
 
-        <div> Your query track: {{track}}</div>
-        <hr>
+        {{track | safe}}
 
-        {% block content %}{% endblock %}
+
+        {% block stream %}{% endblock %}
+        {% block content%}{% endblock %}
 
     </body>
 

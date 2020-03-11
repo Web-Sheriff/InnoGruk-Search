@@ -1,0 +1,552 @@
+ tags serve to delimit
+documents within a file, other tags are used to delimit elements
+within a document.  We discuss these in the order in which they
+typically appear, though the exact order should not be relied upon in
+processing. In some cases, additional tags occur within an element
+delimited by these top level document-internal tags.  These are
+discussed in this section as well.
+
+     We specify below whether each open/close tag pair is used exactly
+once (ONCE) per a story, or a variable (VARIABLE) number of times
+(possibly zero).  In many cases the start tag of a pair appears only
+at the beginning of a line, with the corresponding end tag always
+appearing at the end of the same line.  When this is the case, we
+indicate it with the notation "SAMELINE" below, as an aid to those
+processing the files without SGML tools.  
+
+     1. ,  [ONCE, SAMELINE]: Encloses the date and time
+of the document, possibly followed by some non-date noise material.
+
+     2. ,  [VARIABLE] : Notes on certain hand
+corrections that were done to the original Reuters corpus by Steve
+Finch.
+
+     3. ,  [ONCE, SAMELINE]: Encloses the list of
+TOPICS categories, if any, for the document. If TOPICS categories are
+present, each will be delimited by the tags  and .
+     
+     4. ,  [ONCE, SAMELINE]: Same as 
+but for PLACES categories.
+
+     5. ,  [ONCE, SAMELINE]: Same as 
+but for PEOPLE categories.
+
+     6. ,  [ONCE, SAMELINE]: Same as  but
+for ORGS categories.
+
+     7. ,  [ONCE, SAMELINE]: Same as
+ but for EXCHANGES categories.
+
+     8. ,  [ONCE, SAMELINE]: These tags always
+appear adjacent to each other, since there are no COMPANIES categories
+assigned in the collection.
+    
+     9. ,  [VARIABLE]: These tags bracket control
+characters and other noisy and/or somewhat mysterious material in the
+Reuters stories.
+
+     10. ,  [ONCE]: We have attempted to delimit all the
+textual material of each story between a pair of these tags.  Some
+control characters and other "junk" material may also be included.
+The whitespace structure of the text has been preserved. The 
+tag has the following attribute:
+
+        a. TYPE: This has one of three values: NORM, BRIEF, and
+UNPROC.  NORM is the default value and indicates that the text of the
+story had a normal structure. In this case the TEXT tag appears simply
+as .  The tag appears as  when the story is a
+short one or two line note.  The tags appears as 
+when the format of the story is unusual in some fashion that limited
+our ability to further structure it.
+
+The following tags optionally delimit elements inside the TEXT
+element. Not all stories will have these tags:
+
+        a. ,  : Author of the story. 
+        b. ,  : Location the story
+originated from, and day of the year. 
+        c. ,  : Title of the story. We have attempted
+to capture the text of stories with TYPE="BRIEF" within a 
+element.
+        d. ,  : The main text of the story.
+
+
+VII. Categories 
+
+   A test collection for text categorization contains, at minimum, a
+set of texts and, for each text, a specification of what categories
+that text belongs to.  For the Reuters-21578 collection the documents
+are Reuters newswire stories, and the categories are five different
+sets of content related categories.  For each document, a human
+indexer decided which categories from which sets that document
+belonged to.  The category sets are as follows:
+
+              Number of    Number of Categories   Number of Categories 
+Category Set  Categories     w/ 1+ Occurrences      w/ 20+ Occurrences  
+************  **********   ********************   ******************** 
+EXCHANGES        39                32                       7
+ORGS             56                32                       9
+PEOPLE          267               114                      15
+PLACES          175               147                      60
+TOPICS          135               120                      57
+
+
+The TOPICS categories are economic subject categories.  Examples
+include "coconut", "gold", "inventories", and "money-supply".  This
+set of categories is the one that has been used in almost all previous
+research with the Reuters data. HAYES90b discusses some examples of
+the policies (not always obvious) used by the human indexers in
+deciding whether a document belonged to a particular TOPIC category.
+
+The EXCHANGES, ORGS, PEOPLE, and PLACES categories correspond to named
+entities of the specified type.  Examples include "nasdaq"
+(EXCHANGES), "gatt" (ORGS), "perez-de-cuellar" (PEOPLE), and
+"australia" (PLACES). Typically a document assigned to a category from
+one of these sets explicitly includes some form of the category name
+in the document's text. (Something which is usually not true for
+TOPICS categories.)  However, not all documents containing a named
+entity corresponding to the category name are assigned to these
+category, since the entity was required to be a focus of the news
+story [HAYES90b]. Thus these proper name categories are not as simple
+to assign correctly as might be thought.
+
+Reuters-21578, Distribution 1.0 includes five files
+(all-exchanges-strings.lc.txt, all-orgs-strings.lc.txt,
+all-people-strings.lc.txt, all-places-strings.lc.txt, and
+all-topics-strings.lc.txt) which list the names of *all* legal
+categories in each set.  A sixth file, cat-descriptions_120396.txt
+gives some additional information on the category sets.
+
+Note that a sixth category field, COMPANIES, was present in the
+original Reuters materials distributed by Carnegie Group, but no
+company information was actually included in these fields. In the
+Reuters-21578 collection this field is always empty.
+
+In the table above we note how many categories appear in at least 1 of
+the 21,578 documents in the collection, and how many appear at least
+20 of the documents.  Many categories appear in no documents, but we
+encourage researchers to include these categories when evaluating the
+effectiveness of their categorization system. 
+
+Additional details of the documents, categories, and corpus
+preparation process appear in LEWIS92b, and at greater length in
+Section 8.1 of LEWIS91d.
+
+VIII. Using Reuters-21578 for Text Categorization Research
+
+     In testing a method for text categorization it is important that
+knowledge of the nature of the test data not unduly influence the
+development of the system, or the performance obtained will be
+unrealistically high.  One way of dealing with this is to divide a set
+of data into two subsets: a training set and a test set.  An
+experimenter then develops a categorization system by automated
+training on the training set only, and/or by human knowledge
+engineering based on examination of the training set only.  The
+categorization system is then tested on the previously unexamined test
+set.  A number of variations on this basic theme are possible---see
+WEISS91 for a good discussion.
+
+     Effectiveness results can only be compared between studies that
+the same training and test set (or that use cross-validation
+procedures).  One problem with the Reuters-22173 collection was that
+the ambiguity of formatting and annotation led different researchers
+to use different training/test divisions. This was particularly
+problematic when researchers attempted to remove documents that "had
+no TOPICS", as there were several definitions of what this meant.
+
+     To eliminate these ambiguities from the Reuters-21578 collection
+we specify exactly which articles are in each of the recommended
+training sets and test sets by specifying the values those articles
+will have on the TOPICS, LEWISSPLIT, and CGISPLIT attributes of the
+REUTERS tags.  We strongly encourage that all studies on Reuters-21578
+use one of the following training test divisions (or use multiple
+random splits, e.g. cross-validation):
+
+VIII.A. The Modified Lewis ("ModLewis") Split:
+
+ Training Set (13,625 docs): LEWISSPLIT="TRAIN";  TOPICS="YES" or "NO"
+ Test Set (6,188 docs):  LEWISSPLIT="TEST"; TOPICS="YES" or "NO"
+ Unused (1,765): LEWISSPLIT="NOT-USED" or TOPICS="BYPASS"
+
+This replaces the 14704/6746 split (723 unused) of the Reuters-22173
+collection, which was used in LEWIS91d (Chapters 9 and 10), LEWIS92b,
+LEWIS92c, LEWIS92e, and LEWIS94b. Note the following:
+
+      1. The duplicate documents removed in forming Reuters-21578 are
+of course not present. 
+      2. The documents with TOPICS="BYPASS" are not used, since
+subsequent analysis strongly indicates that they were not categorized
+by the indexers.  
+      3. The 1,765 unused documents should not be tested on and should
+not be used for supervised learning.  However, they may useful as
+additional information on the statistical distribution of words,
+phrases, and other features that might used to predict categories.
+
+This split assigns documents from April 7, 1987 and before to the
+training set, and documents from April 8, 1987 and after to the test
+set.
+
+WARNING: Given the many changes in going from Reuters-22173 to
+Reuters-21578, including correction of many typographical errors in
+category labels, results on the ModLewis split cannot be compared
+with any published results on the Reuters-22173 collection!
+
+
+VIII.B. The Modified Apte ("ModApte") Split :
+
+ Training Set (9,603 docs): LEWISSPLIT="TRAIN";  TOPICS="YES"
+ Test Set (3,299 docs): LEWISSPLIT="TEST"; TOPICS="YES"
+ Unused (8,676 docs):   LEWISSPLIT="NOT-USED"; TOPICS="YES"
+                     or TOPICS="NO" 
+                     or TOPICS="BYPASS"
+
+This replaces the 10645/3672 split (7,856 not used) of the
+Reuters-22173 collection.  These are our best approximation to the
+training and test splits used in APTE94 and APTE94b. Note the
+following:
+
+      1. As with the ModLewis, those documents removed in forming
+Reuters-21578 are not present, and BYPASS documents are not used.  
+      2. The intent in APTE94 and APTE94b was to use the Lewis split,
+but restrict it to documents with at least one TOPICS categories.
+However, but it was not clear exactly what Apte, et al meant by having
+at least one TOPICS category (e.g. how was "bypass" treated, whether
+this was before or after any fixing of typographical errors, etc.). We
+have encoded our interpretation in the TOPICS attribute.  ***Note
+that, as discussed above, some TOPICS="YES" stories have no TOPICS
+categories, and a few TOPICS="NO" stories have TOPICS
+categories. These facts are irrelevant to the definition of the
+split.*** If you are using a learning algorithm that requires each
+training document to have at least TOPICS category, you can screen out
+the training documents with no TOPICS categories. Please do NOT screen
+out any of the 3,299 documents - that will make your results
+incomparable with other studies.
+
+      3. As with ModLewis, it may be desirable to use the 8,676 Unused
+documents for gathering statistical information about feature
+distribution.
+
+As with ModLewis, this split assigns documents from April 7, 1987 and
+before to the training set, and documents from April 8, 1987 and after
+to the test set.  The difference is that only documents with at least
+one TOPICS category are used.  The rationale for this restriction is
+that while some documents lack TOPICS categories because no TOPICS
+apply (i.e. the document is a true negative example for all TOPICS
+categories), it appears that others simply were never assigned TOPICS
+categories by the indexers. (Unfortunately, the amount of time that
+has passed since the collection was created has made it difficult to
+establish exactly what went on during the indexing.)
+
+WARNING: Given the many changes in going from Reuters-22173 to
+Reuters-21578, including correction of many typographical errors in
+category labels, results on the ModApte split cannot be compared
+with any published results on the Reuters-22173 collection!
+
+
+VIII.C. The Modified Hayes ("ModHayes") Split: 
+ Training Set (20856 docs): CGISPLIT="TRAINING-SET"
+ Test Set (722 docs): CGISPLIT="PUBLISHED-TESTSET"
+ Unused (0 docs)
+
+This is the best approximation we have to the training and test splits
+used in HAYES89, HAYES90b, and Chapter 8 of LEWIS91d.  It replaces the
+21450/723 split of the Reuters-22173 collection.  Note the following:
+
+      1. As with the other splits, the duplicate documents removed in
+forming Reuters-21578 are not present. 
+
+      2. "Training" in HAYES89 and HAYES90b was actually done by human
+beings looking at the documents and writing categorization rules. 
+We can not be sure which of the document files were actually looked
+at.  
+
+      3. We specify that the BYPASS stories and the TOPICS=NO stories
+are part of the training set, since they were used during manual
+knowledge engineering in the original Hayes experiments. That does not
+mean researchers are obliged to give these stories to, for instance, a
+supervised learning algorithm.  As mentioned in the other splits, they
+may be more useful for getting distributional information about
+features.
+ 
+There are a number of problems with the ModHayes split that make it
+less than desirable for text categorization research, including
+unusual distribution of categories, pairs of near-duplicate documents,
+and chronological burstiness.  (See [LEWIS90b, Ch. 8] for more
+details.)
+
+Despite these problems, this split is of interest because it provides
+the ability to compare results with those of the CONSTRUE system
+[HAYES89, HAYES90b].  Comparison of results on the ModHayes split with
+previously published results on the original Hayes split in HAYES89
+and HAYES90b (and LEWIS90b, Ch. 8) is possible, though the following
+points should be taken into account:
+
+   1. The testset we provide in the ModHayes split has one fewer
+document than the one Hayes used. The document that was removed
+(OLDID="22026") was a timestamp duplicate of the document with
+OLDID="22027" and NEWID="13234". So in computing effectiveness
+measures for comparison with HAYES89/90b, the document with
+NEWID="13234" should be counted twice.
+
+   2. The documents in the Hayes testset had relatively few errors and
+anomalies in their categorization. And the errors which we did find
+and correct appear unlikely to have affected the original Hayes
+results. In particular, it appears that the only errors in the TOPICS
+field were the addition of a few invalid categories that were not
+evaluated on.  However, for completeness we list the changes in the
+Hayes testset documents made going from Reuters-22173 to Reuters-21578
+(all documents are referred to by their NEWID):
+
+   Removal of invalid TOPIC "loan" : 13234, 16946, 17111, 17112, 17207,
+17217, 17228, 17234, 17271, 17310
+
+   Removal of invalid TOPIC "gbond" : 17138, 17260
+
+   Removal of invalid TOPIC "tbill" : 17258
+
+   Removal of invalid TOPIC "cbond" : 17024
+
+   Removal of invalid TOPIC "fbond" : 17087
+
+   Correction of invalid PEOPLE mancera to mancera-aguayo: 17142,
+17149, 17154, 17177, 17187
+
+   Correction of invalid PEOPLE andriesssen to andriessen : 17366
+
+   Correction of invalid PLACES "ivory" and "coast" to single correct
+PLACE "ivory-coast": 18383
+
+    3. The effectiveness measures used in HAYES89 and HAYES90b were
+somewhat nonstandard. See Ch. 8 of LEWIS91d for a discussion.
+
+
+VIII.D. Other Splits
+  
+     We strongly encourage researchers to use one (or more) of the
+above splits for their experiments (or use cross-validation on one of
+the sets of documents defined in the above splits).  We recommend the
+Modified Apte ("ModApte") Split for research on predicting the TOPICS
+field, since the evidence is that a significant number of documents
+that should have TOPICS do not.  The ModLewis split can be used if the
+researcher has a strong need to test the ability of a system to deal
+with examples belonging to no category. While it is likely that some
+of these examples should indeed belong to a category, the ModLewis
+split is at least better than the corresponding split from
+Reuters-22173, in that it eliminates the "bypass" stories.
+
+     We in particular encourage you to resist the following
+temptations:
+     1. Defining new splits based on whether or not the documents
+actually have any TOPICS categories.  (See the discussion of the
+ModApte split.) 
+     2. Testing your system only on the "easy" categories.  This is a
+temptation we have succumbed to in the past, but will resist in the
+future.  Yes, we know that some of the 135 TOPICS categories have few
+or no positive training examples or few or no positive test examples
+or both.  Yes, purely supervised learning systems will do very badly
+on these categories.  Knowledge-based systems, on the other hand,
+might do well on them, while doing poorly in comparison with
+supervised learning on categories with lots of positive
+examples. These comparisons are of great interest.  Of course, it's of
+great interest to *in addition* analyze subsets of categories
+(e.g. lots of positive examples vs. few positive examples, etc.). 
+ 
+     Note that one strategy we considered and rejected is to assume
+that documents which have no TOPICS but do have categories in other
+fields (PLACES, etc.) could be assumed to belong to no TOPICS
+categories. This does not appear to be a safe assumption - we have
+found a number of examples of documents with PLACES but no TOPICS when
+there are TOPICS that clearly apply.
+
+IX. Feature Sets in Text Categorization 
+
+   For many text categorization methods, particularly those using
+statistical classification techniques, it is convenient to represent
+documents not as a sequence of characters, but rather as a tuple of
+numeric or binary feature values.  For instance, the value of feature
+Fi for a document Dj might be 1 if the string of characters
+"financial" occurred in the document with whitespace on either side,
+and 0 otherwise.  Or the value of Fi for Dj might be the number of
+occurrences of "financial" in document Dj.  In information retrieval
+such features are often called "indexing terms" and one often speaks
+of a term being "present" in a document, to mean that the feature
+takes on a non-default value. (Usually, but not always, any value but
+0 is non-default.)
+
+  Comparisons between text categorization methods that represent
+documents as feature tuples are aided by ensuring that the same tuple
+representation is used with all methods, thus avoiding conflating
+differences in feature extraction with differences in, say, machine
+learning methods.  For that reason, the Reuters-22173 distribution
+included not only the formatted text of the Reuters stories, but also
+feature tuple representations of the stories in each of two feature
+sets, one based on words and one based on noun phrases.  Surprisingly,
+almost no use was made of these files by other researchers, so we have
+not included files of this sort in the Reuters-21578 distribution.
+
+    However, we are willing to make available as part of the
+distribution any tuple representations of this sort that researchers
+want to contribute. (Contact lewis@research.att.com if you would like
+to do this.) Perhaps the ideal situation would be if someone with a
+strong interest in feature set formation produced tuples based on a
+high quality set of features which other researchers interested only
+in learning algorithms could make use of.
+
+
+X. Bibliography
+
+[This needs to be updated.]
+
+@article{APTE94
+ ,author = "Chidanand Apt{\'{e}} and Fred Damerau and Sholom M. Weiss"
+ ,title = "Automated Learning of Decision Rules for Text Categorization"
+ ,journal = "ACM Transactions on Information Systems"
+ ,year = 1994
+ , note = "To appear."
+ }
+
+@inproceedings{APTE94b
+ ,author = "Chidanand Apt{\'{e}} and Fred Damerau and Sholom M. Weiss"
+ ,title = "Toward Language Independent Automated Learning of Text Categorization Models"
+ ,booktitle = sigir94
+ ,year = 1994
+ ,note = "To appear."
+ }
+
+@inproceedings{HAYES89
+,author = "Philip J. Hayes and Peggy M. Anderson and Irene B. Nirenburg and 
+Linda M. Schmandt"
+,title = "{TCS}: A Shell for Content-Based Text Categorization"
+,booktitle = "IEEE Conference on Artificial Intelligence Applications"
+,year = 1990
+}
+
+@inproceedings{HAYES90b
+,author = "Philip J. Hayes and Steven P. Weinstein"
+,title = "{CONSTRUE/TIS:} A System for Content-Based Indexing of a 
+Database of News Stories"
+,booktitle = "Second Annual Conference on Innovative Applications of
+Artificial Intelligence"
+,year = 1990
+}
+
+@incollection{HAYES92 
+ ,author = "Philip J. Hayes"
+ ,title = "Intelligent High-Volume Text Processing using Shallow,
+Domain-Specific Techniques" 
+ ,booktitle = "Text-Based Intelligent Systems"
+ ,publisher = "Lawrence Erlbaum"
+ ,address =  "Hillsdale, NJ"
+ ,year = 1992
+ ,editor = "Paul S. Jacobs"
+}
+
+@inproceedings{LEWIS91c 
+  ,author = "David D. Lewis" 
+  ,title = "Evaluating Text Categorization" 
+  ,booktitle = "Proceedings of Speech and Natural Language Workshop" 
+  ,year = 1991 
+  ,month = feb 
+  ,organization = "Defense Advanced Research Projects Agency" 
+  ,publisher = "Morgan Kaufmann" 
+  ,pages = "312--318" 
+
+}
+
+@phdthesis{LEWIS91d
+,author = "David Dolan Lewis"
+,title = "Representation and Learning in Information Retrieval"
+,school = "Computer Science Dept.; Univ. of Massachusetts; Amherst, MA 01003"
+,year = 1992
+,note = "Technical Report 91--93."
+}
+
+@inproceedings{LEWIS91e
+,author = "David D. Lewis"
+,title = "Data Extraction as Text Categorization: An Experiment with
+the {MUC-3} Corpus"
+,booktitle = "Proceedings of the Third Message Understanding Evaluation
+and Conference"
+,year = 1991
+,month = may
+,organization = "Defense Advanced Research Projects Agency"
+,publisher = "Morgan Kaufmann"
+,address = "Los Altos, CA"
+
+}
+
+@inproceedings{LEWIS92b
+ ,author = "David D. Lewis"
+ ,title = "An Evaluation of Phrasal and Clustered Representations on a Text
+Categorization Task"
+ ,booktitle = "Fifteenth Annual International ACM SIGIR Conference on
+Research and Development in Information Retrieval"
+ ,year = 1992
+ ,pages = "37--50"
+}
+
+@inproceedings{LEWIS92d 
+,author = "David D. Lewis and Richard M. Tong"
+,title = "Text Filtering in {MUC-3} and {MUC-4}"
+,booktitle = "Proceedings of the Fourth Message Understanding Conference ({MUC-4})"
+,year = 1992
+,month = jun
+,organization = "Defense Advanced Research Projects Agency"
+,publisher = "Morgan Kaufmann"
+,address = "Los Altos, CA"
+}
+
+@inproceedings{LEWIS92e
+,author = "David D. Lewis" 
+,title = "Feature Selection and Feature Extraction for Text Categorization"
+,booktitle = "Proceedings of Speech and Natural Language Workshop"
+,year = 1992
+,month = feb 
+,organization = "Defense Advanced Research Projects Agency"
+,publisher = "Morgan Kaufmann"
+,pages = "212--217"
+}
+
+@inproceedings{LEWIS94b
+ ,author = "David D. Lewis and Marc Ringuette"
+ ,title = "A Comparison of Two Learning Algorithms for Text Categorization"
+ ,booktitle = "Symposium on Document Analysis and Information Retrieval"
+ ,year = 1994
+ ,organization = "ISRI; Univ. of Nevada, Las Vegas"
+ ,address = "Las Vegas, NV"
+ ,month = apr
+ ,pages = "81--93"
+}
+
+@article{LEWIS94d
+, author       = "David D. Lewis and Philip J. Hayes"
+, title        = "Guest Editorial"
+, journal      = "ACM Transactions on Information Systems"
+, year         = 1994 
+, volume       = 12
+, number       = 3
+, pages        = "231"
+, month        = jul
+}
+
+@article{SPARCKJONES76
+,author = "K. {Sparck Jones} and  C. J. {van Rijsbergen}"
+,title =  "Information Retrieval Test Collections"
+,journal = "Journal of Documentation"
+,year = 1976
+,volume = 32
+,number = 1
+,pages = "59--75"
+  }
+
+@book{WEISS91
+ ,author = "Sholom M. Weiss and Casimir A. Kulikowski"
+ ,title = "Computer Systems That Learn" 
+ ,publisher = "Morgan Kaufmann"
+ ,year = 1991
+ ,address = "San Mateo, CA"
+ }
+
+
+
+

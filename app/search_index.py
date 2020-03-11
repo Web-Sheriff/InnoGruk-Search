@@ -3,6 +3,7 @@ from itertools import islice
 from pytrie import SortedStringTrie as Trie
 
 from app.normalization import normalize
+from app.stop_words import remove_stop_word
 from app.tokenization import tokenize
 from app.text_preprocess import preprocess
 from app.levenshtein import levenshtein, find_the_closest_words
@@ -24,11 +25,11 @@ def search_disk(query, prfx, psfx, sndx, path):
         for i, prw in enumerate(pr_words):
             if levenshtein(prw, w) <= 1 and '*' in w:
                 pr_words[i] = w
+            elif remove_stop_word([w]):
+                pr_words[i] = remove_stop_word([w])[0]
 
     message += f'Query: {" ".join(words)}\n'
-    message += f'Preprocess function: {preprocess(query)}\n'
     message += f'Preprocessed query: {" ".join(pr_words)}\n'
-    message += '***\n'
 
     for w in pr_words:
 
@@ -37,10 +38,6 @@ def search_disk(query, prfx, psfx, sndx, path):
         track += '&&('
 
         if wildcard:
-
-            if wildcard > 1:
-                message += 'InnoGruk cannot handle two wildcards yet :)\n***\n'
-                break
 
             split_wd = (w.split('*'))
             if split_wd[1] == '':
@@ -98,21 +95,38 @@ def search_disk(query, prfx, psfx, sndx, path):
                 res.append(index_find(w, path))
                 track += w
             except:
-                message += f'There are lots of words with the same soundex: ' \
-                           f'{", ".join(list(islice(sndx[soundex(w)], 5)))}...\n'
-                right_words = find_the_closest_words(w, sndx[soundex(w)])
-                message += f'Probably, you mentioned something from {" ,".join(right_words)} instead of {w}\n***\n'
+                try:
+                    message += f'First five words with the same soundex: ' \
+                               f'\"{", ".join(list(islice(sndx[soundex(w)], 5)))}\"...\n'
+                    right_words = []
+                    if soundex(w) in sndx:
+                        right_words = find_the_closest_words(w, sndx[soundex(w)])
 
-                for ww in right_words:
-                    pre_ww = preprocess(ww)[0]
-                    if pre_ww in index_keys:
-                        res_.append(index_find(pre_ww, path))
-                        track += f'{ww}||'
 
-                track = track[:-2]
+                    if right_words:
+                        message += f'Probably, you mentioned \"{", ".join(right_words)}\" instead of \"{w}\"\n'
+                    else:
+                        message += 'InnoGruk has not recognized what you mention\n'
 
-                res_ = list(reduce(lambda i, j: i | j, (set(x) for x in res_)))
-                res.append(res_)
+                    for ww in right_words:
+                        pre_ww = preprocess(ww)[0]
+                        if pre_ww in index_keys:
+                            res_.append(index_find(pre_ww, path))
+                            track += f'{ww}||'
+
+                    track = track[:-2]
+
+                    res_ = list(reduce(lambda i, j: i | j, (set(x) for x in res_)))
+                    res.append(res_)
+                except:
+                    right_words = []
+                    if soundex(w) in sndx:
+                        right_words = find_the_closest_words(w, sndx[soundex(w)])
+                    track += 'INDEX ERROR'
+                    if right_words:
+                        message += f'These words: \"{w}, {", ".join(right_words)}\" do not belong to index\n'
+                    else:
+                        message += f'The word \"{w}\" does not belong to index\n'
 
         track += ')'
 
@@ -120,12 +134,11 @@ def search_disk(query, prfx, psfx, sndx, path):
     try:
         relevant_documents = list(reduce(lambda i, j: i & j, (set(x) for x in res)))
     except:
-        message += 'NOTHING FOUND BY YOUR QUERY\n'
+        pass
 
     message += f'InnoGruk found {len(relevant_documents)} documents by your query\n'
-    message += '***'
 
-    return message, relevant_documents, track[2:]
+    return message, sorted(relevant_documents), track[2:]
 
 
 if __name__ == '__main__':
@@ -145,7 +158,7 @@ if __name__ == '__main__':
 
     load_index(index, path)
 
-    query = 'apple nov*er gingerr'
+    query = 'ap'
 
     message, result, track = search_disk(query, prfx, psfx, sndx, './index')
     print(message)
